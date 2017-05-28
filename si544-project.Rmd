@@ -1,0 +1,47 @@
+---
+title: "SI544"
+output: html_document
+---
+
+## R Markdown
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(data.table)
+data <- read.csv("confintervals.csv")
+data <- data.table(data)
+data$Rep <- as.factor(data$Rep)
+data$ID <- c(1:9)
+data[19,5] = 10
+data[20,5] = 11
+wilcox.test(bscore~Rep,data = data)
+```
+
+### Descriptive statistics on background score
+```{r echo=FALSE, fig.width=10}
+ggplot(data,
+       aes(ID,bscore,fill=Rep)) + 
+geom_bar(stat="identity",position="dodge") + ggtitle('Background Scores of Control and Treatment Group') + ylab("Background Scores")
+ggplot(data,
+       aes(ID,yscore,fill=Rep)) + 
+geom_bar(stat="identity",position="dodge") + ggtitle('Y-scores Scores of Control and Treatment Group') + ylab("Y Scores")
+mbtext <- mean(data$bscore[data$Rep == 0])
+var_mbtext <- var(data$bscore[data$Rep == 0])
+mbimg <- mean(data$bscore[data$Rep == 1])
+var_mbimg <- var(data$bscore[data$Rep == 1])
+```
+
+### Descriptive statistics on yscore
+```{r echo=FALSE, fig.width=10}
+mYtext <- mean(data$yscore[data$Rep == 0])
+var_mYtext <- var(data$yscore[data$Rep == 0])
+mYimg <- mean(data$yscore[data$Rep == 1])
+var_mYimg <- var(data$yscore[data$Rep == 1])
+```
+
+### # non-identical populations
+```{r echo=FALSE, fig.width=10}
+score.lm <- lm(yscore ~ Rep + bscore + Rep*bscore, data = data)
+summary(score.lm)
+```
